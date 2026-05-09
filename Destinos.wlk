@@ -1,9 +1,7 @@
-object pepita {
-  var energy = 100
+object puenteDeBrooklyn {
+  method puedePasar(mensajero) = mensajero.peso() <= 1000
+}
 
-  method energy() = energy
-
-  method fly(minutes) {
-    energy = energy - minutes * 3
-  }
+object laMatrix {
+  method puedePasar(mensajero) = mensajero.puedeLlamar()
 }

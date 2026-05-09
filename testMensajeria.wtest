@@ -1,9 +1,91 @@
-import example.pepita
+import mensajeros.* 
 
-describe "group of tests for pepita" {
+describe "Tests de Mensajería - Parte 1, 2 y 3" {
 
-  test "pepita has initial energy" {
-    assert.equals(100, pepita.energy())
-  }
+	// --- TESTS PARTE 1 ---
+test "Roberto en camión con un acoplado puede llevar paquete pago al puente" {
+		roberto.setTransporte(camion)
+		roberto.setAcoplados(1) // Pesa 90 + 500 = 590kg
+		
+		paqueteOriginal.estaPago(true)
+		paqueteOriginal.destino(puenteDeBrooklyn)
+		
+		assert.that(paqueteOriginal.puedeSerEntregadoPor(roberto))
+	}
 
+	test "Neo con crédito no puede llevar paquete NO pago a la matrix" {
+		neo.tieneCredito(true)
+		paqueteOriginal.estaPago(false)
+		paqueteOriginal.destino(laMatrix)
+		
+		assert.notThat(paqueteOriginal.puedeSerEntregadoPor(neo))
+	}
+
+	// --- TESTS PARTE 2 ---
+	test "La mensajeria se maneja correctamente (contratar, es grande, peso del último)" {
+		mensajeria.despedirATodos()
+		mensajeria.contratar(roberto)
+		mensajeria.contratar(neo)
+		
+		assert.notThat(mensajeria.esGrande()) // Tiene 2, necesita MAS de 2
+		
+		mensajeria.contratar(chuckNorris)
+		assert.that(mensajeria.esGrande())
+		
+		// El último es Chuck, pesa 80
+		assert.equals(80, mensajeria.pesoDelUltimo())
+	}
+
+	test "El primer empleado puede entregar el paquete" {
+		mensajeria.despedirATodos()
+		mensajeria.contratar(chuckNorris) // Chuck puede ir a cualquier lado y siempre llama
+		
+		paqueteOriginal.estaPago(true)
+		paqueteOriginal.destino(laMatrix)
+		
+		assert.that(mensajeria.puedeEntregarPrimero(paqueteOriginal))
+	}
+
+	// --- TESTS PARTE 3 ---
+	test "Sobrepeso de la empresa" {
+		mensajeria.despedirATodos()
+		// Roberto en camión con 2 acoplados pesa 1090kg
+		roberto.setTransporte(camion)
+		roberto.setAcoplados(2) 
+		mensajeria.contratar(roberto) 
+		
+		// Promedio > 500
+		assert.that(mensajeria.tieneSobrepeso())
+	}
+
+	test "Envío de paquetes y facturación" {
+		mensajeria.despedirATodos()
+		mensajeria.contratar(neo)
+		
+		// El paquetito siempre se puede entregar
+		mensajeria.enviar(paquetito)
+		
+		// El original si no está pago va a pendientes
+		paqueteOriginal.estaPago(false)
+		mensajeria.enviar(paqueteOriginal)
+		
+		assert.equals(1, mensajeria.mensajeros().size())
+		assert.equals(0, mensajeria.facturacion()) // Paquetito sale $0
+	}
+
+	test "Paquetón viajero con múltiples destinos" {
+		mensajeria.despedirATodos()
+		mensajeria.contratar(chuckNorris)
+		
+		paquetonViajero.agregarDestino(laMatrix)
+		paquetonViajero.agregarDestino(puenteDeBrooklyn)
+		
+		// Cuesta 200, si pago 100 no debería poder enviarse
+		paquetonViajero.pagar(100)
+		assert.notThat(paquetonViajero.puedeSerEntregadoPor(chuckNorris))
+		
+		// Pago los otros 100 y ahora sí
+		paquetonViajero.pagar(100)
+		assert.that(paquetonViajero.puedeSerEntregadoPor(chuckNorris))
+	}
 }
